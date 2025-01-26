@@ -1,17 +1,18 @@
-import express from 'express';
-import morgan from 'morgan';
-
+import express from "express";
+import morgan from "morgan";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(express.json());
-app.use(morgan('dev'));
+// Use Morgan for HTTP request logging
+app.use(morgan("combined"));
 
-
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.get("/health", (req, res) => {
+	res.send("Server is healthy");
 });
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+	console.log(`Server is running on port ${PORT}`);
+});
+
+export default app;
