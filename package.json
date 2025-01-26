@@ -17,5 +17,10 @@
     "url": "https://github.com/jasleenkalsi/BackEnd_Assignment-2/issues"
   },
   "homepage": "https://github.com/jasleenkalsi/BackEnd_Assignment-2#readme",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^22.10.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
 }
