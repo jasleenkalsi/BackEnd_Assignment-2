@@ -1,27 +1,23 @@
-import swaggerJsdoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
-import { Application } from 'express';
+import swaggerJsDoc from 'swagger-jsdoc';
 
-const options = {
-  definition: {
-    openapi: '3.0.0',
+const swaggerDefinition = {
+    openapi: '3.0.0', // OpenAPI version
     info: {
-      title: 'Express API Documentation',
-      version: '1.0.0',
-      description: 'API documentation for the Express application',
+        title: 'Backend Assignment API', // API title
+        version: '1.0.0', // API version
+        description: 'API documentation for Backend Assignment 2', // Description
     },
     servers: [
-      {
-        url: 'http://localhost:5000/api/v1',
-        description: 'Development server',
-      },
+        {
+            url: 'http://localhost:3000', // Your API base URL
+        },
     ],
-  },
-  apis: ['./app.ts'], // Adjust path if necessary
 };
 
-const swaggerSpec = swaggerJsdoc(options);
-
-export const setupSwagger = (app: Application): void => {
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+const options = {
+    definition: swaggerDefinition,
+    apis: ['./src/routes/.ts'], // Path to your API routes for Swagger comments
 };
+
+const swaggerSpec = swaggerJsDoc(options);
+export default swaggerSpec;

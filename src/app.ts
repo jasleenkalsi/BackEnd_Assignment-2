@@ -1,19 +1,16 @@
-import express from "express";
-import morgan from "morgan";
-
+import express from 'express';
+import morgan from 'morgan';
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerConfig from '../config/swagger'; // Adjust if necessary
 
 const app = express();
 
-// Use Morgan for HTTP request logging
-app.use(morgan("combined"));
+// Middleware
+app.use(morgan('combined'));
 
-app.get("/health", (req, res) => {
-	res.send("Server is healthy");
-});
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-	console.log(`Server is running on port ${PORT}`);
-});
+// Swagger setup
+const swaggerSpec = swaggerJsdoc(swaggerConfig);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 export default app;
