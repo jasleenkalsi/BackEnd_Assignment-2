@@ -1,4 +1,4 @@
-import swaggerJsdoc from "swagger-jsdoc";
+import swaggerJsdoc from "swagger-jsdoc";  // ✅ Corrected import
 import swaggerUi from "swagger-ui-express";
 import { Express } from "express";
 
@@ -17,16 +17,11 @@ const swaggerOptions = {
       },
     ],
   },
-  apis: ["./src/routes/employeeRoutes.ts"], // Adjust the path as needed
+  apis: ["../api/v1/routes/employeeRoutes"],  // ✅ Ensuring all route files are included
 };
 
-// Generate Swagger Docs
-const swaggerDocs = swaggerJsdoc(swaggerOptions);
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
-// Function to setup Swagger in Express
-const setupSwagger = (app: Express) => {
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-  console.log("Swagger Docs available at http://localhost:3001/api-docs");
+export const setupSwagger = (app: Express) => {
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 };
-
-export default setupSwagger;

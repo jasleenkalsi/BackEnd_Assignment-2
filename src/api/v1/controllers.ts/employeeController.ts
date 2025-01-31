@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as employeeService from 'src/api/v1/services/employeeService';
+import * as employeeService from '../services/employeeService';
 
 // Get all employees
 export const getAllEmployees = (req: Request, res: Response): void => {
