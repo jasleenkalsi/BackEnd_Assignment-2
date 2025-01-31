@@ -2,6 +2,8 @@ import express from "express";
 import morgan from "morgan";
 import { setupSwagger} from "../config/swagger";
 import employeeRoutes from "./api/v1/routes/employeeRoutes"; 
+import branchRoutes from "./api/v1/routes/branchRoutes";
+
 
 const app = express();
 
@@ -11,6 +13,7 @@ app.use(morgan("combined"));
 
 // Mount API routes
 app.use("/api/v1/employees", employeeRoutes);
+app.use("/api/v1/branch", branchRoutes);
 
 // Health check route
 app.get("/health", (req, res) => {
