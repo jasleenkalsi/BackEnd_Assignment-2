@@ -1,23 +1,32 @@
-import swaggerJsDoc from 'swagger-jsdoc';
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import { Express } from "express";
 
-const swaggerDefinition = {
-    openapi: '3.0.0', // OpenAPI version
+// Swagger options
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.0",
     info: {
-        title: 'Backend Assignment API', // API title
-        version: '1.0.0', // API version
-        description: 'API documentation for Backend Assignment 2', // Description
+      title: "Employee API",
+      version: "1.0.0",
+      description: "API documentation for Employee management system",
     },
     servers: [
-        {
-            url: 'http://localhost:3001', // Your API base URL
-        },
+      {
+        url: "http://localhost:3001",
+      },
     ],
+  },
+  apis: ["./src/routes/employeeRoutes.ts"], // Adjust the path as needed
 };
 
-const options = {
-    definition: swaggerDefinition,
-    apis: ['./src/routes/.ts'], // Path to your API routes for Swagger comments
+// Generate Swagger Docs
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+
+// Function to setup Swagger in Express
+const setupSwagger = (app: Express) => {
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+  console.log("Swagger Docs available at http://localhost:3001/api-docs");
 };
 
-const swaggerSpec = swaggerJsDoc(options);
-export default swaggerSpec;
+export default setupSwagger;

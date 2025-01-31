@@ -1,16 +1,12 @@
-import express from 'express';
-import morgan from 'morgan';
-import swaggerUi from 'swagger-ui-express';
-import swaggerJsdoc from 'swagger-jsdoc';
-import swaggerConfig from '../config/swagger'; // Adjust if necessary
+import express from "express";
+import setupSwagger from "../config/swagger"; // Import Swagger setup
 
 const app = express();
 
 // Middleware
-app.use(morgan('combined'));
+app.use(express.json());
 
-// Swagger setup
-const swaggerSpec = swaggerJsdoc(swaggerConfig);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Setup Swagger
+setupSwagger(app);
 
-export default app;
+export default app;

@@ -1,12 +1,10 @@
-import express from 'express';
+import app from "./app";
+import { Server } from "http";
 
-const app = express();
-const PORT = 3001;
+const PORT: string | number = process.env.PORT || 3001;
 
-app.get('/', (req, res) => {
-  res.send('welcome to API');
+const server: Server = app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+export default server;
