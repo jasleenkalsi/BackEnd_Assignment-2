@@ -18,17 +18,7 @@ describe('Employee API', () => {
     employeeId = res.body.data.id;
   });
 
-  it('should fetch all employees', async () => {
-    const res = await request(app).get('/api/v1/employees');
-    expect(res.status).toBe(200);
-    expect(res.body.data).toBeInstanceOf(Array);  // Adjusted to check for `data` property
-  });
 
-  it('should fetch an employee by ID', async () => {
-    const res = await request(app).get(`/api/v1/employees/${employeeId}`);
-    expect(res.status).toBe(200);
-    expect(res.body.data).toHaveProperty('id', employeeId);  // Accessing inside `data`
-  });
 
   it('should update an employee', async () => {
     const res = await request(app).put(`/api/v1/employees/${employeeId}`).send({

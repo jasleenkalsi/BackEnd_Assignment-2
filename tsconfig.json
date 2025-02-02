@@ -14,11 +14,11 @@
         "strictPropertyInitialization": true,
         "noImplicitThis": true,
         "alwaysStrict": true,
-        "baseUrl": "./",
+        "baseUrl": "./src",
         "paths": {
-            "*": ["*"]
+            "*": ["node_modules/*", "src/*"]
         }
     },
-    "include": ["src/**/*.ts", "test/**/*.ts", "config/**/*"],
+    "include": ["src/**/*.ts", "test/**/*.ts", "config/**/*", "src/api/v1/controllers"],
     "exclude": ["node_modules", "dist"]
 }

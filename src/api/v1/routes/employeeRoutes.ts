@@ -4,17 +4,17 @@ import {
     addEmployee,
     updateEmployee,
     deleteEmployee,
-} from "../controllers.ts/employeeController";
+} from "../controllers/employeeController";
 
 const router: Router = Router();
 
 /**
- * Define routes for book management
+ * Define routes for employee management
  */
-router.get("/", getAllEmployees);
-router.post("/", addEmployee);
-router.put("/:id", updateEmployee);
-router.delete("/:id", deleteEmployee);
+router.get("/", getAllEmployees); // Get all employees
+router.post("/", addEmployee); // Add a new employee
+router.put("/:id", updateEmployee); // Update an existing employee by ID
+router.delete("/:id", deleteEmployee); // Delete an employee by ID
 
 export default router;
 
