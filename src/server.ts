@@ -1,10 +1,18 @@
-import app from "./app";
-import { Server } from "http";
+import express, { Express, Request, Response } from "express";
 
-const PORT: string | number = process.env.PORT || 3001;
+const app: Express = express();
+const port: number = 3001;
 
-const server: Server = app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+function add(a: number, b: number): number {
+    const sum: number = a + b; // Set a breakpoint here
+    return sum;
+}
+
+app.get("/", (req: Request, res: Response) => {
+    const result: number = add(5, 10);
+    res.send(`The sum is: ${result}`);
 });
 
-export default server;
+app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+});

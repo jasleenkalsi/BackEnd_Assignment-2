@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import {Branch} from "../models/branchModel";
 
 // Create a new branch
 export const createBranch = (req: Request, res: Response) => {
