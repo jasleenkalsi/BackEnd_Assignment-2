@@ -3,8 +3,7 @@
 # Debugging Analysis
 
 ## Scenario 1: Branch Creation Debugging
-
-- **Breakpoint Location**: `src/api/v1/controllers/branchController.ts`, line 15
+- **Breakpoint Location**: `src/api/v1/controllers/branchController.ts`, line 5
 - **Objective**: Investigating how the `createBranch` function creates a new branch and returns the `id`.
 
 ### Debugger Observations
@@ -40,7 +39,7 @@
 
 - **Variable States**:
   - `employeeId`: 101
-  - `updatedData`: { name: 'John Doe', position: 'Developer' }
+  - `updatedData`: { name: 'jasleen', position: 'Developer' }
 - **Call Stack**:
   - `updateEmployee` → `Employee.findByIdAndUpdate()`
 - **Behavior**:
