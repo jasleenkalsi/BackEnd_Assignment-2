@@ -56,7 +56,7 @@
 - **How does this enhance your understanding of the overall project?**
   - This scenario taught me the importance of validating data before performing database operations.
 
----
+
 
 ## Scenario 3: Employee and Branch Relationship Debugging
 
