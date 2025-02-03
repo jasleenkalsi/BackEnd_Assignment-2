@@ -26,7 +26,7 @@ export const getEmployeeById = (req: Request, res: Response): void => {
     }
 };
 
-// Add a new employee
+// Add a new employee to
 export const addEmployee = (req: Request, res: Response): void => {
     try {
         const newEmployee = req.body;
