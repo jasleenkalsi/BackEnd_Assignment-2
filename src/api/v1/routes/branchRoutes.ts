@@ -1,21 +1,18 @@
-import { Router } from 'express';
-import { createBranch, getAllBranches, getBranchById, updateBranch, deleteBranch } from '../controllers/branchController';
+import { Router } from "express";
+import {
+  getAllBranches,
+  getBranchById,
+  createBranch,
+  updateBranch,
+  deleteBranch,
+} from "../controllers/branchController";
 
-const router = Router();
+const router: Router = Router();
 
-// Create a new branch
-router.post('/', createBranch);
-
-// Get all branches
-router.get('/', getAllBranches);
-
-// Get a branch by ID
-router.get('/:id', getBranchById);
-
-// Update a branch
-router.put('/:id', updateBranch);
-
-// Delete a branch
-router.delete('/:id', deleteBranch);
+router.get("/", getAllBranches);
+router.get("/:id", getBranchById);
+router.post("/", createBranch);
+router.put("/:id", updateBranch);
+router.delete("/:id", deleteBranch);
 
 export default router;

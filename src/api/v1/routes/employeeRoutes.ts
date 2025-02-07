@@ -1,20 +1,17 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
-    getAllEmployees,
-    addEmployee,
-    updateEmployee,
-    deleteEmployee,
-} from "../controllers/employeeController";
+  getAllEmployees,
+  addEmployee,
+  updateEmployee,
+  deleteEmployee,
+} from '../controllers/employeeController'; // Adjust the path if necessary
 
 const router: Router = Router();
 
-/**
- * Define routes for employee management
- */
-router.get("/", getAllEmployees); // Get all employees
-router.post("/", addEmployee); // Add a new employee
-router.put("/:id", updateEmployee); // Update an existing employee by ID
-router.delete("/:id", deleteEmployee); // Delete an employee by ID
+// Define routes
+router.get('/', getAllEmployees);
+router.post('/', addEmployee);
+router.put('/:id', updateEmployee);
+router.delete('/:id', deleteEmployee);
 
 export default router;
-
