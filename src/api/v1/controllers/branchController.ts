@@ -1,7 +1,18 @@
-import { Request, Response } from "express";
+import { Request, Response,NextFunction } from "express";
 import * as branchService from "../services/branchService";
 
+export const createEmployee = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+      const { name, position, email, branchId } = req.body;
 
+      // Business logic (later replaced with Firestore)
+      const newEmployee = { name, position, email, branchId, id: Date.now().toString() };
+
+      return res.status(201).json({ message: 'Employee created', employee: newEmployee });
+  } catch (error) {
+      next(error);
+  }
+};
 
 // Get all branches
 export const getAllBranches = (req: Request, res: Response): void => {
