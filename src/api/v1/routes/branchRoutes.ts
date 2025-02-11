@@ -13,31 +13,6 @@ const router: Router = Router();
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     Branch:
- *       type: object
- *       required:
- *         - name
- *         - location
- *       properties:
- *         id:
- *           type: string
- *           description: Unique branch ID
- *         name:
- *           type: string
- *           description: Name of the branch
- *         location:
- *           type: string
- *           description: Address or location of the branch
- *       example:
- *         id: "1"
- *         name: "Main Branch"
- *         location: "123 Main St, Cityville"
- */
-
-/**
- * @swagger
  * /api/v1/branches:
  *   get:
  *     summary: Get all branches
@@ -45,12 +20,6 @@ const router: Router = Router();
  *     responses:
  *       200:
  *         description: Successfully retrieved the list of branches.
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Branch'
  */
 router.get("/", getAllBranches);
 
@@ -70,10 +39,6 @@ router.get("/", getAllBranches);
  *     responses:
  *       200:
  *         description: Successfully retrieved branch details.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Branch'
  *       404:
  *         description: Branch not found.
  */
@@ -90,14 +55,20 @@ router.get("/:id", getBranchById);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Branch'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Name of the branch
+ *               address:
+ *                 type: string
+ *                 description: Address of the branch
+ *               phone:
+ *                 type: string
+ *                 description: Contact phone number
  *     responses:
  *       201:
  *         description: Branch created successfully.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Branch'
  */
 router.post("/", validateRequest(branchSchema), createBranch);
 
@@ -119,14 +90,20 @@ router.post("/", validateRequest(branchSchema), createBranch);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Branch'
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Updated name of the branch
+ *               address:
+ *                 type: string
+ *                 description: Updated address of the branch
+ *               phone:
+ *                 type: string
+ *                 description: Updated contact phone number
  *     responses:
  *       200:
  *         description: Branch updated successfully.
- *       400:
- *         description: Invalid input.
- *       404:
- *         description: Branch not found.
  */
 router.put("/:id", validateRequest(branchSchema), updateBranch);
 
