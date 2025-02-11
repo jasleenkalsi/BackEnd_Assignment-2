@@ -4,7 +4,9 @@ import {
   addEmployee,
   updateEmployee,
   deleteEmployee,
-} from "../controllers/employeeController"; // Adjust the path if necessary
+} from "../controllers/employeeController";
+import { validateRequest } from "../middleware/validate";
+import { employeeSchema } from "../schemas/employeeSchema"; // Ensure correct path
 
 const router: Router = Router();
 
@@ -17,6 +19,12 @@ const router: Router = Router();
  *     responses:
  *       200:
  *         description: Successfully retrieved the list.
+ */
+router.get("/", getAllEmployees);
+
+/**
+ * @swagger
+ * /api/v1/employees:
  *   post:
  *     summary: Add a new employee
  *     description: Create a new employee record.
@@ -31,14 +39,15 @@ const router: Router = Router();
  *                 type: string
  *               position:
  *                 type: string
- *               salary:
- *                 type: number
+ *               email:
+ *                 type: string
+ *               branchId:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Employee added successfully.
  */
-router.get("/", getAllEmployees);
-router.post("/", addEmployee);
+router.post("/", validateRequest(employeeSchema), addEmployee);
 
 /**
  * @swagger
@@ -64,13 +73,15 @@ router.post("/", addEmployee);
  *                 type: string
  *               position:
  *                 type: string
- *               salary:
- *                 type: number
+ *               email:
+ *                 type: string
+ *               branchId:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Employee updated successfully.
  */
-router.put("/:id", updateEmployee);
+router.put("/:id", validateRequest(employeeSchema), updateEmployee);
 
 /**
  * @swagger
