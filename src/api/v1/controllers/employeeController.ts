@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import * as employeeService from "../services/employeeService";
 
 // Get all employees
-export const getAllEmployees = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllEmployees = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const employees = await employeeService.getAllEmployees();
     res.status(200).json({ message: "Employees retrieved", data: employees });
@@ -12,7 +12,7 @@ export const getAllEmployees = async (req: Request, res: Response, next: NextFun
 };
 
 // Add a new employee
-export const addEmployee = async (req: Request, res: Response, next: NextFunction) => {
+export const addEmployee = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const newEmployee = await employeeService.createEmployee(req.body);
     res.status(201).json({
@@ -25,13 +25,14 @@ export const addEmployee = async (req: Request, res: Response, next: NextFunctio
 };
 
 // Update an existing employee
-export const updateEmployee = async (req: Request, res: Response, next: NextFunction) => {
+export const updateEmployee = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
     const updatedEmployee = await employeeService.updateEmployee(Number(id), req.body);
     
     if (!updatedEmployee) {
-      return res.status(404).json({ message: "Employee not found" });
+      res.status(404).json({ message: "Employee not found" });
+      return;
     }
 
     res.status(200).json({
@@ -44,13 +45,14 @@ export const updateEmployee = async (req: Request, res: Response, next: NextFunc
 };
 
 // Delete an employee
-export const deleteEmployee = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteEmployee = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
     const success = await employeeService.deleteEmployee(Number(id));
     
     if (!success) {
-      return res.status(404).json({ message: "Employee not found" });
+      res.status(404).json({ message: "Employee not found" });
+      return;
     }
 
     res.status(200).json({ message: `Employee with ID ${id} deleted successfully` });
