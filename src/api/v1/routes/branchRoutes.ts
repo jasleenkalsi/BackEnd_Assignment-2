@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { validateRequest } from "../middleware/validate";
+import { validate } from "../middleware/validate"; // Ensure correct import
 import { branchSchema } from "../schemas/branchSchema";
 import {
   getAllBranches,
@@ -70,7 +70,7 @@ router.get("/:id", getBranchById);
  *       201:
  *         description: Branch created successfully.
  */
-router.post("/", validateRequest(branchSchema), createBranch);
+router.post("/", validate(branchSchema), createBranch);
 
 /**
  * @swagger
@@ -105,7 +105,7 @@ router.post("/", validateRequest(branchSchema), createBranch);
  *       200:
  *         description: Branch updated successfully.
  */
-router.put("/:id", validateRequest(branchSchema), updateBranch);
+router.put("/:id", validate(branchSchema), updateBranch);
 
 /**
  * @swagger
