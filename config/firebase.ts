@@ -1,10 +1,14 @@
 import admin from "firebase-admin";
-import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config();
+// Load Firebase Service Account Key
+const serviceAccount = require(path.resolve(__dirname, "./firebase-adminsdk.json"));
 
 admin.initializeApp({
-    credential: admin.credential.cert(require("../../firebase-adminsdk.json"))
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://firestore.googleapis.com/v1/projects/back-end-project-3d9fe/databases/(default)" // Use your actual project ID
 });
 
-export const db = admin.firestore();
+const db = admin.firestore();
+
+export { db };
