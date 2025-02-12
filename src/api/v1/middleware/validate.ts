@@ -1,18 +1,20 @@
-import { Request, Response, NextFunction } from "express";
-import { Schema } from "joi";
+import { Request, Response, NextFunction, RequestHandler } from "express";
+import { ObjectSchema } from "joi";
 
-export const validateRequest = (schema: Schema) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
-    const { error } = schema.validate(req.body, { abortEarly: false });
+// Validation Middleware
+export const validate = (schema: ObjectSchema): RequestHandler => {
+    return (req: Request, res: Response, next: NextFunction): void => {
+        const { error } = schema.validate(req.body, { abortEarly: false });
 
-    if (error) {
-      res.status(400).json({
-        message: "Validation failed",
-        errors: error.details.map((detail) => detail.message),
-      });
-      return; // ✅ Ensure function stops execution
-    }
+        if (error) {
+            res.status(400).json({
+                status: "error",
+                message: "Validation failed",
+                errors: error.details.map((err) => err.message),
+            });
+            return; // Ensures request handling stops here
+        }
 
-    next(); // ✅ Proceed only if validation succeeds
-  };
+        next(); // Pass to the next middleware/controller
+    };
 };
