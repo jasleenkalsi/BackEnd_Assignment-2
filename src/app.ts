@@ -3,6 +3,8 @@ import morgan from "morgan";
 import { setupSwagger} from "../config/swagger";
 import employeeRoutes from "./api/v1/routes/employeeRoutes"; 
 import branchRoutes from './api/v1/routes/branchRoutes';
+import { errorHandler } from "./api/v1/middleware/errorHandler";  
+ // Import the error handler
 
 
 const app = express();
@@ -22,5 +24,9 @@ app.get("/health", (req, res) => {
 
 // Setup Swagger
 setupSwagger(app);
+
+// Global Error Handling Middleware (MUST be after routes)
+app.use(errorHandler);
+
 
 export default app;
