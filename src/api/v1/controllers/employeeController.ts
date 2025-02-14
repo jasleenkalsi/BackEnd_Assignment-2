@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import * as employeeService from "../services/employeeService";
+import { AppError } from "../middleware/errorHandler";
 
 // Get all employees
 export const getAllEmployees = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -28,7 +29,7 @@ export const addEmployee = async (req: Request, res: Response, next: NextFunctio
 export const updateEmployee = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
-    const updatedEmployee = await employeeService.updateEmployee(Number(id), req.body);
+    const updatedEmployee = await employeeService.updateEmployee(String(id), req.body); // ✅ FIXED HERE
     
     if (!updatedEmployee) {
       res.status(404).json({ message: "Employee not found" });
@@ -48,7 +49,7 @@ export const updateEmployee = async (req: Request, res: Response, next: NextFunc
 export const deleteEmployee = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
-    const success = await employeeService.deleteEmployee(Number(id));
+    const success = await employeeService.deleteEmployee(String(id)); // ✅ FIXED HERE
     
     if (!success) {
       res.status(404).json({ message: "Employee not found" });

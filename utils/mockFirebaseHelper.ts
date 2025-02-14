@@ -1,87 +1,178 @@
-import { Firestore } from "@google-cloud/firestore";
+import { firestore } from "firebase-admin";
 
 /**
- * Mock Firestore class to simulate Firestore interactions in tests.
+ * Firestore Test Helpers
+ *
+ * This file contains utility functions to help mock Firestore operations in your tests.
+ * These helpers make it easier to write unit tests for code that interacts with Firestore,
+ * without actually connecting to a real Firestore database.
  */
-class MockFirestore {
-  collections: { [key: string]: any } = {};
-
-  collection(name: string) {
-    if (!this.collections[name]) {
-      this.collections[name] = new MockCollection(name);
-    }
-    return this.collections[name];
-  }
-}
 
 /**
- * Mock Firestore Collection class
+ * MockFirestoreData represents the structure of a Firestore document.
+ * It's a flexible type that can contain any key-value pairs, just like a real Firestore document.
  */
-class MockCollection {
-  name: string;
-  documents: { [key: string]: any } = {};
+export type MockFirestoreData = {
+    [key: string]: unknown;
+};
 
-  constructor(name: string) {
-    this.name = name;
-  }
+export type MockFirestoreCollection = {
+    doc: jest.Mock;
+    add: jest.Mock;
+};
 
-  async add(data: any) {
-    const id = Math.random().toString(36).substring(7); // Generate a random ID
-    this.documents[id] = { id, ...data };
-    return { id, get: () => Promise.resolve({ exists: true, id, data: () => this.documents[id] }) };
-  }
+export type MockFirestoreQuery = {
+    get: jest.Mock;
+    where: jest.Mock;
+    orderBy: jest.Mock;
+    limit: jest.Mock;
+};
 
-  async doc(id: string) {
-    return new MockDocument(this, id);
-  }
+export type MockSnapshot = {
+    docs: FirestoreDocumentSnapshot[];
+};
 
-  async get() {
-    const docs = Object.keys(this.documents).map((id) => ({
-      id,
-      data: () => this.documents[id],
-    }));
-    return { docs };
-  }
-}
+export type MockFirestoreDocumentSnapshot = {
+    data: () => MockFirestoreData;
+    id: string;
+};
+
+export type MockQuerySnapshot = {
+    docs: MockFirestoreDocumentSnapshot[];
+    forEach: jest.Mock;
+    empty: boolean;
+    size: number;
+};
+
+export type FirestoreDocumentSnapshot<T = unknown> = {
+    id: string;
+    data: () => T;
+};
+
+export type PartialMockFirestoreTransaction = Partial<{
+    [K in keyof firestore.Transaction]: jest.Mock;
+}>;
 
 /**
- * Mock Firestore Document class
+ * mockFirestoreCollection creates a mock Firestore collection with a single document.
+ *
+ * @param docData - The data to be stored in the mock document
+ * @param id - The ID of the mock document (defaults to "mockDocId" if not provided)
+ *
+ * @returns An object that mimics a Firestore collection reference
+ *
+ * Usage example:
+ * const mockCollection = mockFirestoreCollection({ name: "John", age: 30 }, "user123");
  */
-class MockDocument {
-  collection: MockCollection;
-  id: string;
-
-  constructor(collection: MockCollection, id: string) {
-    this.collection = collection;
-    this.id = id;
-  }
-
-  async get() {
-    const data = this.collection.documents[this.id];
-    return { exists: !!data, id: this.id, data: () => data };
-  }
-
-  async set(data: any) {
-    this.collection.documents[this.id] = { id: this.id, ...data };
-    return;
-  }
-
-  async update(data: any) {
-    if (!this.collection.documents[this.id]) {
-      throw new Error("Document does not exist");
-    }
-    this.collection.documents[this.id] = { ...this.collection.documents[this.id], ...data };
-    return;
-  }
-
-  async delete() {
-    delete this.collection.documents[this.id];
-    return;
-  }
-}
+export const mockFirestoreCollection = (
+    docData: MockFirestoreData,
+    id: string = "mockDocId"
+): MockFirestoreCollection => {
+    return {
+        doc: jest.fn().mockReturnValue({
+            set: jest.fn().mockResolvedValue(undefined),
+            get: jest.fn().mockResolvedValue({
+                id,
+                exists: true,
+                data: () => ({ ...docData }),
+            }),
+            update: jest.fn().mockResolvedValue(undefined),
+            delete: jest.fn().mockResolvedValue(undefined),
+            id,
+        }),
+        add: jest.fn().mockResolvedValue({ id }),
+    };
+};
 
 /**
- * Mock Firestore instance for unit testing
+ * mockFirestoreTransaction is a mock of a Firestore transaction object.
+ * It provides mock functions for common transaction operations.
+ *
+ * Usage example:
+ * // In your test:
+ * mockFirestoreTransaction.get.mockResolvedValue(someMockDocumentData);
  */
-const mockFirestore = new MockFirestore();
-export { mockFirestore, MockFirestore };
+export const mockFirestoreTransaction: jest.Mocked<firestore.Transaction> = {
+    get: jest.fn(),
+    getAll: jest.fn(),
+    create: jest.fn(),
+    set: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+};
+
+/**
+ * mockQuerySnapshot creates a mock of a Firestore query snapshot.
+ *
+ * @param docs - An array of document data to be included in the snapshot
+ *
+ * @returns An object that mimics a Firestore query snapshot
+ *
+ * Usage example:
+ * const mockSnapshot = mockQuerySnapshot([
+ *     { id: "doc1", name: "John" },
+ *     { id: "doc2", name: "Jane" }
+ * ]);
+ */
+export const mockQuerySnapshot = (
+    docs: MockFirestoreData[]
+): MockQuerySnapshot => ({
+    docs: docs.map((doc) => ({
+        data: (): MockFirestoreData => doc,
+        id: (doc.id as string) || "mockDocId",
+    })),
+    forEach: jest.fn((callback) =>
+        docs.forEach((doc) =>
+            callback({
+                data: (): MockFirestoreData => doc,
+                id: (doc.id as string) || "mockDocId",
+            })
+        )
+    ),
+    empty: docs.length === 0,
+    size: docs.length,
+});
+
+/**
+ * mockFirestoreQuery creates a mock of a Firestore query.
+ *
+ * @param docs - An array of document data to be returned by the query
+ *
+ * @returns An object that mimics a Firestore query
+ *
+ * Usage example:
+ * const mockQuery = mockFirestoreQuery([
+ *     { id: "doc1", name: "John" },
+ *     { id: "doc2", name: "Jane" }
+ * ]);
+ */
+export const mockFirestoreQuery = (
+    docs: MockFirestoreData[]
+): MockFirestoreQuery => ({
+    get: jest.fn().mockResolvedValue(mockQuerySnapshot(docs)),
+    where: jest.fn().mockReturnThis(),
+    orderBy: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockReturnThis(),
+});
+
+/**
+ * How to use these helpers in your tests:
+ *
+ * 1. Import the helpers you need in your test file:
+ *    import { mockFirestoreCollection, mockFirestoreQuery } from './path-to-this-file';
+ *
+ * 2. In your test, use these helpers to create mock Firestore objects:
+ *    const mockCollection = mockFirestoreCollection({ name: "John" }, "user123");
+ *    const mockQuery = mockFirestoreQuery([{ id: "doc1", name: "John" }]);
+ *
+ * 3. Use Jest to mock your Firestore module and return these mock objects:
+ *    jest.mock('./your-firestore-module', () => ({
+ *      collection: jest.fn().mockReturnValue(mockCollection),
+ *      query: jest.fn().mockReturnValue(mockQuery),
+ *    }));
+ *
+ * 4. Now you can test your functions that interact with Firestore without actually connecting to a database.
+ *
+ * Remember: These helpers create simplified versions of Firestore objects.
+ * They may not cover all possible Firestore behaviors, so you might need to extend them for more complex scenarios.
+ */

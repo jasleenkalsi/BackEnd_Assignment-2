@@ -1,14 +1,11 @@
-import admin from "firebase-admin";
-import path from "path";
+import { initializeApp, cert, ServiceAccount } from "firebase-admin/app";
+import { getFirestore, Firestore } from "firebase-admin/firestore";
+import serviceAccount from "../back-end-project-3d9fe-firebase-adminsdk-fbsvc-6eb648cacc.json";
 
-// Load Firebase Service Account Key
-const serviceAccount = require(path.resolve(__dirname, "./firebase-adminsdk.json"));
-
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://firestore.googleapis.com/v1/projects/back-end-project-3d9fe/databases/(default)" 
+initializeApp({
+	credential: cert(serviceAccount as ServiceAccount),
 });
 
-const db = admin.firestore();
+const db: Firestore = getFirestore();
 
 export { db };

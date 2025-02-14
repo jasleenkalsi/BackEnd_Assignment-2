@@ -1,11 +1,11 @@
-
 import Joi from "joi";
 
 export const employeeSchema = Joi.object({
-    name: Joi.string().min(3).max(50).required(),
-    position: Joi.string().min(3).max(30).required(),
-    department: Joi.string().min(3).max(30).required(),
-    email: Joi.string().email().required(),
-    phone: Joi.string().pattern(/^[0-9]{10}$/).required(),
-    branchId: Joi.string().required(),
-});
+  name: Joi.string(),
+  position: Joi.string(),
+  department: Joi.string(),
+  email: Joi.string().email(),
+  phone: Joi.string().pattern(/^\d{10}$/),
+  branchId: Joi.string(),
+  salary: Joi.number(),
+}).min(1);

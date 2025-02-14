@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-// Define a Custom Error Class for Application Errors
+// 🔹 Define a Custom Error Class
 class AppError extends Error {
     statusCode: number;
 
@@ -11,11 +11,10 @@ class AppError extends Error {
     }
 }
 
-// Global Error Handling Middleware
+// 🔹 Global Error Handling Middleware
 const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
     console.error("Error:", err.message);
 
-    // If it's an instance of our custom AppError, use its status code
     const statusCode = err instanceof AppError ? err.statusCode : 500;
 
     res.status(statusCode).json({

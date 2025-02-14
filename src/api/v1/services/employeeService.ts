@@ -1,10 +1,10 @@
-
+import { db } from "../../../../config/firebase";
 import { Employee } from "../models/employeeModel";  
 
 
 const employee: Employee[] = [
     {
-        id: 1,
+        id: "1",
         name: "Alice Johnson",
         position: "Branch Manager",
         department: "Management",
@@ -13,7 +13,7 @@ const employee: Employee[] = [
         branchId: 1,
     },
     {
-        id: 2,
+        id: "2",
         name: "Amandeep Singh",
         position: "Customer Service Representative",
         department: "Customer Service",
@@ -22,7 +22,7 @@ const employee: Employee[] = [
         branchId: 2,
     },
     {
-        id: 3,
+        id: "3",
         name: "Maria Garcia",
         position: "Loan Officer",
         department: "Loans",
@@ -31,7 +31,7 @@ const employee: Employee[] = [
         branchId: 3,
     },
     {
-        id: 4,
+        id: "4",
         name: "James Wilson",
         position: "IT Support Specialist",
         department: "IT",
@@ -40,7 +40,7 @@ const employee: Employee[] = [
         branchId: 1,
     },
     {
-        id: 5,
+        id: "5",
         name: "Linda Martinez",
         position: "Financial Advisor",
         department: "Advisory",
@@ -49,7 +49,7 @@ const employee: Employee[] = [
         branchId: 2,
     },
     {
-        id: 6,
+        id:"6",
         name: "Michael Brown",
         position: "Teller",
         department: "Operations",
@@ -58,7 +58,7 @@ const employee: Employee[] = [
         branchId: 3,
     },
     {
-        id: 7,
+        id: "7",
         name: "Patricia Taylor",
         position: "Operations Manager",
         department: "Operations",
@@ -68,7 +68,7 @@ const employee: Employee[] = [
     },
 
     {
-        id: 8,
+        id: "8",
         name: "	Chen Wei",
         position: "Senior Loan Officer",
         department: "Loans",
@@ -80,38 +80,88 @@ const employee: Employee[] = [
     
 ];
 
-
-let employees: Employee[] = [];
-
-// Get all employees
-export const getAllEmployees = (): Employee[] => {
-    return employees;
-};
-
-// Get an employee by ID
-export const getEmployeeById = (id: number): Employee | undefined => {
-    return employees.find(employee => employee.id === id);
-};
-
-// Create a new employee
-export const createEmployee = (newEmployee: Employee): Employee => {
-    newEmployee.id = employees.length + 1;  // Simple logic for generating unique IDs
-    employees.push(newEmployee);
-    return newEmployee;
-};
-
-// Update an existing employee
-export const updateEmployee = (id: number, updatedData: Partial<Employee>): Employee | undefined => {
-    const index = employees.findIndex(employee => employee.id === id);
-    if (index === -1) return undefined;
-    employees[index] = { ...employees[index], ...updatedData };
-    return employees[index];
-};
-
-// Delete an employee
-export const deleteEmployee = (id: number): boolean => {
-    const index = employees.findIndex(employee => employee.id === id);
-    if (index === -1) return false;
-    employees.splice(index, 1);
-    return true;
-};
+/** 🔹 Get All Employees (Firestore) */
+export const getAllEmployees = async (): Promise<Employee[]> => {
+    try {
+      const snapshot = await db.collection("employees").get();
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Employee[];
+    } catch (error) {
+      console.error(`Failed to retrieve employees: ${error}`);
+      throw new Error("Failed to retrieve employees");
+    }
+  };
+  
+  /** 🔹 Get Employee by ID (Firestore) */
+  export const getEmployeeById = async (id: string): Promise<Employee | null> => {
+    try {
+      const doc = await db.collection("employees").doc(id).get();
+      return doc.exists ? ({ id, ...doc.data() } as Employee) : null;
+    } catch (error) {
+      console.error(`Failed to retrieve employee (ID: ${id}): ${error}`);
+      throw new Error(`Failed to retrieve employee with ID: ${id}`);
+    }
+  };
+  
+  /** 🔹 Create Employee (Firestore) */
+  export const createEmployee = async (employeeData: Omit<Employee, "id">) => {
+    try {
+      const employeeRef = db.collection("employees").doc();
+      await employeeRef.set(employeeData);
+      return { id: employeeRef.id, ...employeeData }; // ✅ Return with ID
+    } catch (error) {
+      console.error(`Failed to create employee: ${error}`);
+      throw new Error("Failed to create employee");
+    }
+  };
+  
+  /** 🔹 Update Employee (Firestore) */
+  export const updateEmployee = async (id: string, updatedData: Partial<Employee>): Promise<Employee | null> => {
+    try {
+      const employeeRef = db.collection("employees").doc(id);
+      const doc = await employeeRef.get();
+  
+      if (!doc.exists) {
+        console.error(`Employee not found: ${id}`);
+        return null;
+      }
+  
+      const existingData = doc.data() as Employee;
+  
+      if (Object.keys(updatedData).length === 0) {
+        console.error(`No valid fields provided for update (ID: ${id})`);
+        throw new Error("No valid fields provided for update.");
+      }
+  
+      // 🔹 Merge existing data with provided updates
+      const mergedData = {
+        name: updatedData.name ?? existingData.name,
+        position: updatedData.position ?? existingData.position,
+        department: updatedData.department ?? existingData.department,
+        email: updatedData.email ?? existingData.email,
+        phone: updatedData.phone ?? existingData.phone,
+        branchId: updatedData.branchId ?? existingData.branchId,
+      };
+  
+      await employeeRef.update(mergedData);
+      return { id, ...mergedData };
+    } catch (error: any) {
+      console.error(`Failed to update employee (ID: ${id}): ${error.message}`);
+      throw new Error(`Failed to update employee with ID: ${id}`);
+    }
+  };
+  
+  /** 🔹 Delete Employee (Firestore) */
+  export const deleteEmployee = async (id: string): Promise<boolean> => {
+    try {
+      const employeeRef = db.collection("employees").doc(id);
+      const doc = await employeeRef.get();
+  
+      if (!doc.exists) return false;
+  
+      await employeeRef.delete();
+      return true;
+    } catch (error) {
+      console.error(`Failed to delete employee (ID: ${id}): ${error}`);
+      throw new Error(`Failed to delete employee with ID: ${id}`);
+    }
+  };

@@ -1,12 +1,9 @@
-import { db } from "../../../../config/firebase";
-import { FirestoreDataTypes } from "../types/firestore";
+import { getFirestore, Firestore } from "firebase-admin/firestore";
 
-interface FieldValuePair {
-	fieldName: string;
-	fieldValue: FirestoreDataTypes;
-}
+/** 🔹 Initialize Firestore (Ensures `db` is correctly referenced) */
+const db: Firestore = getFirestore();
 
-// Custom Error Classes
+/** 🔹 Custom Error Classes */
 class RepositoryError extends Error {
 	constructor(message: string) {
 		super(message);
@@ -21,113 +18,85 @@ class ServiceError extends Error {
 	}
 }
 
-/**
- * Executes a series of operations within a Firestore transaction.
- * @param {(transaction: FirebaseFirestore.Transaction) => Promise<T>} operations - Function containing the operations to perform within the transaction.
- * @returns {Promise<T>} - The result of the transaction.
- */
+/** 🔹 Executes Firestore Transaction */
 export const runTransaction = async <T>(
 	operations: (transaction: FirebaseFirestore.Transaction) => Promise<T>
 ): Promise<T> => {
 	try {
 		return await db.runTransaction(operations);
-	} catch (error) {
-		console.error("Transaction failed:", error);
+	} catch (error: any) {
+		console.error("Transaction failed:", error.message);
 		throw new RepositoryError("Transaction execution failed");
 	}
 };
 
-/**
- * Creates a new document in a Firestore collection.
- * @param {string} collectionName - The collection name.
- * @param {Partial<T>} data - The document data.
- * @param {string} [id] - Optional document ID.
- * @returns {Promise<string>} - The ID of the newly created document.
- */
-export const createDocument = async <T>(
+/** 🔹 Creates a New Firestore Document */
+export const createDocument = async <T extends FirebaseFirestore.DocumentData>(
 	collectionName: string,
 	data: Partial<T>,
 	id?: string
 ): Promise<string> => {
 	try {
-		let docRef: FirebaseFirestore.DocumentReference;
+		let docRef: FirebaseFirestore.DocumentReference<T>;
 
 		if (id) {
-			docRef = db.collection(collectionName).doc(id);
-			await docRef.set(data);
+			docRef = db.collection(collectionName).doc(id) as FirebaseFirestore.DocumentReference<T>;
+			await docRef.set(data as T);
 		} else {
-			docRef = await db.collection(collectionName).add(data);
+			docRef = await db.collection(collectionName).add(data) as FirebaseFirestore.DocumentReference<T>;
 		}
 
 		return docRef.id;
-	} catch (error) {
-		console.error(`Failed to create document in ${collectionName}:`, error);
+	} catch (error: any) {
+		console.error(`Failed to create document in ${collectionName}:`, error.message);
 		throw new RepositoryError("Failed to create document");
 	}
 };
 
-/**
- * Retrieves all documents from a Firestore collection.
- * @param {string} collectionName - The collection name.
- * @returns {Promise<FirebaseFirestore.QuerySnapshot>} - The documents snapshot.
- */
-export const getDocuments = async (
+/** 🔹 Retrieves All Firestore Documents */
+export const getDocuments = async <T extends FirebaseFirestore.DocumentData>(
 	collectionName: string
-): Promise<FirebaseFirestore.QuerySnapshot> => {
+): Promise<FirebaseFirestore.QuerySnapshot<T>> => {
 	try {
-		return await db.collection(collectionName).get();
-	} catch (error) {
-		console.error(`Failed to fetch documents from ${collectionName}:`, error);
+		return await db.collection(collectionName).get() as FirebaseFirestore.QuerySnapshot<T>;
+	} catch (error: any) {
+		console.error(`Failed to fetch documents from ${collectionName}:`, error.message);
 		throw new RepositoryError("Failed to retrieve documents");
 	}
 };
 
-/**
- * Retrieves a document by ID.
- * @param {string} collectionName - The collection name.
- * @param {string} id - The document ID.
- * @returns {Promise<FirebaseFirestore.DocumentSnapshot | null>} - The document or null.
- */
-export const getDocumentById = async (
+/** 🔹 Retrieves a Firestore Document by ID */
+export const getDocumentById = async <T extends FirebaseFirestore.DocumentData>(
 	collectionName: string,
 	id: string
-): Promise<FirebaseFirestore.DocumentSnapshot | null> => {
+): Promise<FirebaseFirestore.DocumentSnapshot<T> | null> => {
 	try {
-		const doc = await db.collection(collectionName).doc(id).get();
+		const doc = await db.collection(collectionName).doc(id).get() as FirebaseFirestore.DocumentSnapshot<T>;
 		return doc.exists ? doc : null;
-	} catch (error) {
-		console.error(`Failed to fetch document ${id} from ${collectionName}:`, error);
+	} catch (error: any) {
+		console.error(`Failed to fetch document ${id} from ${collectionName}:`, error.message);
 		throw new RepositoryError("Document retrieval failed");
 	}
 };
 
-/**
- * Updates an existing document.
- * @param {string} collectionName - The collection name.
- * @param {string} id - The document ID.
- * @param {Partial<T>} data - The updated document data.
- * @returns {Promise<void>}
- */
-export const updateDocument = async <T>(
+/** 🔹 Updates an Existing Firestore Document */
+export const updateDocument = async <T extends FirebaseFirestore.DocumentData>(
 	collectionName: string,
 	id: string,
 	data: Partial<T>
 ): Promise<void> => {
 	try {
-		await db.collection(collectionName).doc(id).update(data);
-	} catch (error) {
-		console.error(`Failed to update document ${id} in ${collectionName}:`, error);
+		// 🔹 Ensure no `undefined` values are passed to Firestore
+		const cleanedData = Object.fromEntries(Object.entries(data).filter(([_, value]) => value !== undefined));
+
+		await db.collection(collectionName).doc(id).update(cleanedData);
+	} catch (error: any) {
+		console.error(`Failed to update document ${id} in ${collectionName}:`, error.message);
 		throw new RepositoryError("Document update failed");
 	}
 };
 
-/**
- * Deletes a document.
- * @param {string} collectionName - The collection name.
- * @param {string} id - The document ID.
- * @param {FirebaseFirestore.Transaction} [transaction] - Optional Firestore transaction.
- * @returns {Promise<void>}
- */
+/** 🔹 Deletes a Firestore Document */
 export const deleteDocument = async (
 	collectionName: string,
 	id: string,
@@ -140,47 +109,8 @@ export const deleteDocument = async (
 		} else {
 			await docRef.delete();
 		}
-	} catch (error) {
-		console.error(`Failed to delete document ${id} from ${collectionName}:`, error);
+	} catch (error: any) {
+		console.error(`Failed to delete document ${id} from ${collectionName}:`, error.message);
 		throw new RepositoryError("Document deletion failed");
-	}
-};
-
-/**
- * Deletes documents based on multiple field values.
- * @param {string} collectionName - The collection name.
- * @param {FieldValuePair[]} fieldValuePairs - Field-value pairs to filter on.
- * @param {FirebaseFirestore.Transaction} [transaction] - Optional Firestore transaction.
- * @returns {Promise<void>}
- */
-export const deleteDocumentsByFieldValues = async (
-	collectionName: string,
-	fieldValuePairs: FieldValuePair[],
-	transaction?: FirebaseFirestore.Transaction
-): Promise<void> => {
-	try {
-		let query = db.collection(collectionName) as FirebaseFirestore.Query;
-
-		fieldValuePairs.forEach(({ fieldName, fieldValue }) => {
-			query = query.where(fieldName, "==", fieldValue);
-		});
-
-		let snapshot: FirebaseFirestore.QuerySnapshot;
-
-		if (transaction) {
-			snapshot = await transaction.get(query);
-			snapshot.docs.forEach((doc) => transaction.delete(doc.ref));
-		} else {
-			snapshot = await query.get();
-			const batch = db.batch();
-			snapshot.docs.forEach((doc) => batch.delete(doc.ref));
-			await batch.commit();
-		}
-	} catch (error) {
-		const fieldValueString = fieldValuePairs
-			.map(({ fieldName, fieldValue }) => `${fieldName} == ${fieldValue}`)
-			.join(" AND ");
-		console.error(`Failed to delete documents from ${collectionName} where ${fieldValueString}:`, error);
-		throw new RepositoryError("Batch document deletion failed");
 	}
 };
