@@ -1,14 +1,32 @@
-import { db } from "../config/firebase";  // Keep the path relative to config folder
+import { createDocument, getDocumentById, updateDocument, deleteDocument } from "../src/api/v1/repository/firestoreRepository";
+import { db } from "../config/firebase"; // Ensure correct Firebase config import
 
-const testFirestore = async () => {
-    try {
-        const docRef = db.collection("test").doc("sample");
-        await docRef.set({ message: "Hello, Firestore!" });
+describe("Firestore Repository Tests", () => {
+  let testDocId: string;
 
-        console.log(" Firestore test document created successfully!");
-    } catch (error) {
-        console.error(" Firestore error:", error);
-    }
-};
+  beforeAll(async () => {
+    testDocId = await createDocument("employees", {
+      name: "Jasleen",
+      email: "jasleen@example.com",
+      position: "Software Engineer",
+    });
+  });
 
-testFirestore();
+  test("Should retrieve the created document", async () => {
+    const doc = await getDocumentById("employees", testDocId);
+    expect(doc).toBeDefined();
+    expect(doc?.data()?.name).toBe("Jasleen");
+  });
+
+  test("Should update the document", async () => {
+    await updateDocument("employees", testDocId, { position: "Senior Engineer" });
+    const updatedDoc = await getDocumentById("employees", testDocId);
+    expect(updatedDoc?.data()?.position).toBe("Senior Engineer");
+  });
+
+  test("Should delete the document", async () => {
+    await deleteDocument("employees", testDocId);
+    const deletedDoc = await getDocumentById("employees", testDocId);
+    expect(deletedDoc).toBeNull();
+  });
+});

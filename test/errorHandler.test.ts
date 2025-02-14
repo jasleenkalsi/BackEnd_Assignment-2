@@ -1,18 +1,18 @@
 import request from "supertest";
 import app from "../src/app";
 
-describe("Global Error Handler", () => {
-    test("Should return 404 for a non-existent branch", async () => {
-        const res = await request(app).get("/api/v1/branches/999");
-        expect(res.status).toBe(404);
-        expect(res.body.message).toBe("Branch with ID 999 not found");
-    });
+describe("Error Handling Middleware", () => {
+  test("Should return 404 error for non-existent employee", async () => {
+    const response = await request(app).get("/api/v1/employees/nonexistentID");
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe("Employee not found");
+  });
 
-    test("Should return 400 for validation error", async () => {
-        const res = await request(app)
-            .post("/api/v1/branches")
-            .send({ name: "" }); // Invalid input
-        expect(res.status).toBe(400);
-        expect(res.body.message).toContain("name is not allowed to be empty");
-    });
+  test("Should return validation error for invalid employee data", async () => {
+    const response = await request(app)
+      .post("/api/v1/employees")
+      .send({ name: "J", position: "" }); // Invalid input
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
+  });
 });

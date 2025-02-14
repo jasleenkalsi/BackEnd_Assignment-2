@@ -1,13 +1,51 @@
-import { employeeSchema } from '../src/api/v1/schemas/employeeSchema';
+import Joi from "joi";
+import { branchSchema } from "../src/api/v1/schemas/branchSchema";
+import { employeeSchema } from "../src/api/v1/schemas/employeeSchema"; // Adjust path if needed
 
-test('Valid employee data should pass validation', () => {
-  const validData = { name: 'Alice', email: 'alice@example.com', position: 'Manager', salary: 50000 };
-  const { error } = employeeSchema.validate(validData);
-  expect(error).toBeUndefined();
+describe("Validation Tests", () => {
+  test("Valid employee data should pass validation", () => {
+    const validData = {
+      name: "Jasleen Kalsi",
+      position: "Software Engineer",
+      email: "jasleen@example.com",
+      branchId: "branch123",
+    };
+
+    const { error } = employeeSchema.validate(validData);
+    expect(error).toBeUndefined();
+  });
+
+  test("Invalid employee email should fail validation", () => {
+    const invalidData = {
+      name: "John Doe",
+      position: "Manager",
+      email: "invalid-email",
+      branchId: "branch123",
+    };
+
+    const { error } = employeeSchema.validate(invalidData);
+    expect(error).toBeDefined();
+  });
+
+  test("Valid branch data should pass validation", () => {
+    const validData = {
+      name: "Main Branch",
+      address: "123 Main Street",
+      phone: "+1234567890",
+    };
+
+    const { error } = branchSchema.validate(validData);
+    expect(error).toBeUndefined();
+  });
+
+  test("Missing branch name should fail validation", () => {
+    const invalidData = {
+      address: "123 Main Street",
+      phone: "+1234567890",
+    };
+
+    const { error } = branchSchema.validate(invalidData);
+    expect(error).toBeDefined();
+  });
 });
 
-test('Invalid email should fail validation', () => {
-  const invalidData = { name: 'Bob', email: 'invalid-email', position: 'Staff', salary: 40000 };
-  const { error } = employeeSchema.validate(invalidData);
-  expect(error).toBeDefined();
-});
