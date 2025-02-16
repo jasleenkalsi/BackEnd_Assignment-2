@@ -1,32 +1,23 @@
-import { createDocument, getDocumentById, updateDocument, deleteDocument } from "../src/api/v1/repository/firestoreRepository";
-import { db } from "../config/firebase"; // Ensure correct Firebase config import
+import request from "supertest";
+import app from "../src/app";
 
-describe("Firestore Repository Tests", () => {
-  let testDocId: string;
+describe("Error Handling Middleware", () => {
+  test("Should return 404 error for non-existent employee", async () => {
+    const response = await request(app).get("/api/v1/employees/nonexistentID");
 
-  beforeAll(async () => {
-    testDocId = await createDocument("employees", {
-      name: "Jasleen",
-      email: "jasleen@example.com",
-      position: "Software Engineer",
-    });
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe("Employee not found"); // Ensure the message is returned
   });
 
-  test("Should retrieve the created document", async () => {
-    const doc = await getDocumentById("employees", testDocId);
-    expect(doc).toBeDefined();
-    expect(doc?.data()?.name).toBe("Jasleen");
-  });
+  test("Should return validation error for invalid employee data", async () => {
+    const response = await request(app)
+      .post("/api/v1/employees")
+      .send({ name: "J", position: "" }); // Invalid input
 
-  test("Should update the document", async () => {
-    await updateDocument("employees", testDocId, { position: "Senior Engineer" });
-    const updatedDoc = await getDocumentById("employees", testDocId);
-    expect(updatedDoc?.data()?.position).toBe("Senior Engineer");
-  });
-
-  test("Should delete the document", async () => {
-    await deleteDocument("employees", testDocId);
-    const deletedDoc = await getDocumentById("employees", testDocId);
-    expect(deletedDoc).toBeNull();
+    expect(response.status).toBe(400);
+    
+    // Match correct response format
+    expect(response.body.success).toBe(false);
+    expect(response.body.errors).toBeDefined();  // Ensure that validation errors are provided
   });
 });

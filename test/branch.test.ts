@@ -26,7 +26,11 @@ describe("Branch Controller", () => {
   });
 
   test("should update an existing branch", async () => {
-    const updatedData = { name: "Updated Branch Name" };
+    const updatedData = {
+      name: "Updated Branch Name",
+      address: "456 New Address",   // Include address field
+      phone: "0987654321"           // Include phone field (ensure it's valid, e.g., 10 digits)
+    };
   
     // Send the request to update the branch
     const res = await request(app).put(`/api/v1/branches/${createdBranchId}`).send(updatedData);
@@ -40,6 +44,8 @@ describe("Branch Controller", () => {
     // Check if the name was actually updated
     if (res.body.data) {
       expect(res.body.data.name).toBe("Updated Branch Name");
+      expect(res.body.data.address).toBe("456 New Address");  // Verify the address is updated
+      expect(res.body.data.phone).toBe("0987654321");        // Verify the phone number is updated
     } else {
       // Handle the case where there's no data or error
       console.error('Error updating branch:', res.body.message || res.body);
