@@ -9,6 +9,8 @@ describe("Validation Tests", () => {
       position: "Software Engineer",
       email: "jasleen@example.com",
       branchId: "branch123",
+      department: "IT",
+      phone: "1234567890"
     };
 
     const { error } = employeeSchema.validate(validData);
@@ -28,7 +30,7 @@ describe("Validation Tests", () => {
   });
 
   test("Valid phone number should pass validation", () => {
-    const validData = { phone: "+12345678901" };
+    const validData = { name: "Test Branch", phone: "12345678901", address: "123 Main St" };
     const { error } = branchSchema.validate(validData);
     expect(error).toBeUndefined();
   });
@@ -36,11 +38,10 @@ describe("Validation Tests", () => {
   test("Missing branch name should fail validation", () => {
     const invalidData = {
       address: "123 Main Street",
-      phone: "+1234567890",
+      phone: "1234567890",
     };
 
     const { error } = branchSchema.validate(invalidData);
     expect(error).toBeDefined();
   });
 });
-
