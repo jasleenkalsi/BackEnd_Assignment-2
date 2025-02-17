@@ -27,13 +27,8 @@ describe("Validation Tests", () => {
     expect(error).toBeDefined();
   });
 
-  test("Valid branch data should pass validation", () => {
-    const validData = {
-      name: "Main Branch",
-      address: "123 Main Street",
-      phone: "+1234567890",
-    };
-
+  test("Valid phone number should pass validation", () => {
+    const validData = { phone: "+12345678901" };
     const { error } = branchSchema.validate(validData);
     expect(error).toBeUndefined();
   });

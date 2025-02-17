@@ -8,7 +8,7 @@ describe("Branch Controller", () => {
     const newBranch = {
       name: "Downtown Branch",
       address: "123 Main Street",
-      phone: "1234567890"  // Ensure it's exactly 10 digits
+      phone: "1234567890"  
     };
 
     const response = await request(app).post("/api/v1/branches").send(newBranch);

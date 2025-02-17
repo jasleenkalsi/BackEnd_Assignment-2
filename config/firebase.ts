@@ -1,11 +1,13 @@
-import { initializeApp, cert, ServiceAccount } from "firebase-admin/app";
-import { getFirestore, Firestore } from "firebase-admin/firestore";
-import serviceAccount from "../back-end-project-3d9fe-firebase-adminsdk-fbsvc-6eb648cacc.json";
+import admin from "firebase-admin";
+import { getFirestore } from "firebase-admin/firestore";
+import  serviceAccount from "../back-end-project-3d9fe-firebase-adminsdk-fbsvc-6eb648cacc.json";
 
-initializeApp({
-	credential: cert(serviceAccount as ServiceAccount),
-});
+// ✅ Fix: Ensure Firebase is initialized once
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+  });
+}
 
-const db: Firestore = getFirestore();
-
+const db = getFirestore();
 export { db };
