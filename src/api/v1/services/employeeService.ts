@@ -95,12 +95,21 @@ export const getAllEmployees = async (): Promise<Employee[]> => {
   export const getEmployeeById = async (id: string): Promise<Employee | null> => {
     try {
       const doc = await db.collection("employees").doc(id).get();
-      return doc.exists ? ({ id, ...doc.data() } as Employee) : null;
+      
+      if (!doc.exists) {
+        console.log(`🚨 Debug: Employee with ID ${id} not found.`);
+        return null; // ✅ Ensure `null` is returned
+      }
+  
+      console.log(`✅ Debug: Found Employee`, doc.data());
+      return { id, ...doc.data() } as Employee;
     } catch (error) {
       console.error(`Failed to retrieve employee (ID: ${id}): ${error}`);
       throw new Error(`Failed to retrieve employee with ID: ${id}`);
     }
   };
+  
+  
   
   /** 🔹 Create Employee (Firestore) */
   export const createEmployee = async (employeeData: Omit<Employee, "id">) => {

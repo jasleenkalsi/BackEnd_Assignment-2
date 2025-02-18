@@ -8,7 +8,7 @@ export const validate = (schema: ObjectSchema): RequestHandler => {
 
         if (error) {
             res.status(400).json({
-                status: "error",
+                success: false,  // 🔥 Ensure success field exists
                 message: "Validation failed",
                 errors: error.details.map((err) => err.message),
             });

@@ -30,7 +30,7 @@ describe("Validation Tests", () => {
   });
 
   test("Valid phone number should pass validation", () => {
-    const validData = { name: "Test Branch", phone: "12345678901", address: "123 Main St" };
+    const validData = { name: "Test Branch", phone: "1234567890", address: "123 Main St" };
     const { error } = branchSchema.validate(validData);
     expect(error).toBeUndefined();
   });

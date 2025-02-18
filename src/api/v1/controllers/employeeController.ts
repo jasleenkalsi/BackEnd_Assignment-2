@@ -61,3 +61,25 @@ export const deleteEmployee = async (req: Request, res: Response, next: NextFunc
     next(error);
   }
 };
+
+export const getEmployeeById = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const employee = await employeeService.getEmployeeById(id);
+
+    if (!employee) {
+      console.log("🚨 Debug: Employee not found"); // ✅ Debug log
+      return res.status(404).json({
+        success: false, // ✅ Ensure response has `success: false`
+        message: "Employee not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: employee,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
