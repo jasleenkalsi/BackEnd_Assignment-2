@@ -1,72 +1,81 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import * as branchService from "../services/branchService";
+import { AppError } from "../middleware/errorHandler";
 
-
-
-// Get all branches
-export const getAllBranches = (req: Request, res: Response): void => {
+// 🔹 Get All Branches
+export const getAllBranches = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const branches = branchService.getAllBranches();
-    res.status(200).json(branches);
+    const branches = await branchService.getAllBranches(); // ✅ Ensure async call
+    res.status(200).json({ data: branches });
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving branches" });
+    next(error);
   }
 };
 
-// Get a branch by ID
-export const getBranchById = (req: Request, res: Response): void => {
+// 🔹 Get a Branch by ID
+export const getBranchById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const branch = branchService.getBranchById(Number(id));
-    if (branch) {
-      res.status(200).json({ message: `Branch with ID ${id} retrieved`, data: branch });
-    } else {
-      res.status(404).json({ message: "Branch not found" });
+    const branch = await branchService.getBranchById(id); // ✅ Firestore uses string IDs
+
+    if (!branch) {
+      throw new AppError("Branch not found", 404);
     }
+
+    res.status(200).json({ message: `Branch with ID ${id} retrieved`, data: branch });
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving branch" });
+    next(error);
   }
 };
 
-// Create a new branch
-export const createBranch = (req: Request, res: Response): void => {
+// 🔹 Create a Branch
+export const createBranch = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const newBranch = branchService.createBranch(req.body);
+    const { name, address, phone } = req.body;
+
+    if (!name || !address || !phone) {
+      throw new AppError("Missing required fields", 400);
+    }
+
+    const newBranch = await branchService.createBranch({ name, address, phone });
+
     res.status(201).json({
-      id: newBranch.id,
       message: "Branch created successfully",
+      data: { id: newBranch.id } // ✅ Ensure response follows `{ data: { id: ... } }`
     });
   } catch (error) {
-    res.status(500).json({ message: "Error creating branch" });
+    next(error);
   }
 };
 
-// Update a branch
-export const updateBranch = (req: Request, res: Response): void => {
+// 🔹 Update a Branch
+export const updateBranch = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const updatedBranch = branchService.updateBranch(Number(id), req.body);
-    if (updatedBranch) {
-      res.status(200).json({ message: `Branch with ID ${id} updated successfully` });
-    } else {
-      res.status(404).json({ message: "Branch not found" });
+    const updatedBranch = await branchService.updateBranch(id, req.body); // ✅ Firestore ID is a string
+
+    if (!updatedBranch) {
+      throw new AppError("Branch not found", 404);
     }
+
+    res.status(200).json({ message: `Branch with ID ${id} updated successfully`, data: updatedBranch });
   } catch (error) {
-    res.status(500).json({ message: "Error updating branch" });
+    next(error);
   }
 };
 
-// Delete a branch
-export const deleteBranch = (req: Request, res: Response): void => {
+// 🔹 Delete a Branch
+export const deleteBranch = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    const success = branchService.deleteBranch(Number(id));
-    if (success) {
-      res.status(200).json({ message: `Branch with ID ${id} deleted successfully` });
-    } else {
-      res.status(404).json({ message: "Branch not found" });
+    const success = await branchService.deleteBranch(id); // ✅ Firestore ID is a string
+
+    if (!success) {
+      throw new AppError("Branch not found", 404);
     }
+
+    res.status(200).json({ message: `Branch with ID ${id} deleted successfully` });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting branch" });
+    next(error);
   }
 };
