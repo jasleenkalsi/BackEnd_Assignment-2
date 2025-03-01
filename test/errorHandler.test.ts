@@ -5,7 +5,7 @@ describe("Error Handling Middleware", () => {
   test("Should return 404 error for non-existent employee", async () => {
     const response = await request(app).get("/api/v1/employees/nonexistentID");
   
-    console.log("🚀 Debug - Full API Response:", response.body);
+    console.log(" Debug - Full API Response:", response.body);
   
     expect(response.status).toBe(404);
     expect(response.body).toMatchObject({
