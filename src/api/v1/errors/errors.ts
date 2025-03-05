@@ -1,7 +1,5 @@
 import { HTTP_STATUS } from "../constants/httpConstants";
 
-
-
 /**
  * Base error class for application errors.
  * Extends the built-in Error class to include an error code and status code.

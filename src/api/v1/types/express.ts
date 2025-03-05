@@ -8,8 +8,11 @@ export type MiddlewareFunction = (
 
 export type RequestBody = Record<string, unknown>;
 
-export type RequestData<T extends RequestBody = RequestBody> = {
-	body: T;
-	params: Record<string, string>;
-	query: Record<string, string | string[]>;
-};
+
+export interface AuthenticatedRequest<T = Record<string, unknown>> extends Request {
+  body: T;
+  user?: {
+    uid: string;
+    role: string;
+  };
+}
