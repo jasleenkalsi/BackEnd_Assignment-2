@@ -1,13 +1,23 @@
-import admin from "firebase-admin";
-import { getFirestore } from "firebase-admin/firestore";
-import  serviceAccount from "../back-end-project-3d9fe-firebase-adminsdk-fbsvc-35334a5138.json";
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import dotenv from "dotenv";
 
-// ✅ Fix: Ensure Firebase is initialized once
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-  });
-}
+// Load environment variables
+dotenv.config();
 
-const db = getFirestore();
-export { db };
+const firebaseConfig = {
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+export { auth, db };
