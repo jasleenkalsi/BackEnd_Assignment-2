@@ -28,8 +28,6 @@ app.use("/api/v1/employees", employeeRoutes);
 // Setup Swagger Documentation
 setupSwagger(app); // ✅ This should already serve Swagger UI
 
-
-
 // Error Handling Middleware
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
@@ -39,4 +37,6 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`Swagger Docs available at http://localhost:${PORT}/api-docs`);
+  console.log("Firebase API Key:", process.env.FIREBASE_API_KEY ? "Loaded ✅" : "Not Loaded ❌");
+
 });
