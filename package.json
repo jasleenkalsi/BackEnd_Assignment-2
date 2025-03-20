@@ -21,6 +21,7 @@
   "homepage": "https://github.com/jasleenkalsi/BackEnd_Assignment-2#readme",
   "description": "",
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/firebase": "^2.4.32",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.4",
@@ -34,6 +35,7 @@
   "dependencies": {
     "@types/express": "^5.0.0",
     "@types/morgan": "^1.9.9",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "firebase-admin": "^13.2.0",
