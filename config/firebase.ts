@@ -1,9 +1,15 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import * as admin from "firebase-admin";
 import dotenv from "dotenv";
 
 // Load environment variables
 dotenv.config();
+
+// Initialize Firebase Admin SDK (No need for apiKey, authDomain, etc.)
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.applicationDefault(),
+  });
+}
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -14,8 +20,6 @@ const firebaseConfig = {
   appId: process.env.FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = admin.firestore();  // ✅ Correct Firestore instance
 
-export { db, collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc };
+export { db, admin };
