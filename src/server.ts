@@ -15,7 +15,11 @@ const PORT = process.env.PORT || 3003; // ✅ Use environment variable for port
 // Middleware
 app.use(express.json());
 app.use(helmet());
-app.use(cors({ origin: ["http://localhost:3003", "https://your-frontend.com"] }));
+app.use(cors({
+  origin: ["https://jasleenkalsi.github.io/api-docs/"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 
 // API Routes
 app.use("/api/v1/branches", branchRoutes);
